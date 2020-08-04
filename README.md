@@ -32,7 +32,8 @@ aws_access_key_id = <some-access-key-id>
 aws_secret_access_key = <some-secret-access-key>
 ```
 
-I have provided a couple of Docker Images to help with assuming a role. First build the image: `./assume-role/ build`
+I have provided a couple of Docker Images to help with assuming a role. First build the image: 
+```./assume-role/go build```
 
 There are two ways you can run the Docker Image:
 
