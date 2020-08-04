@@ -1,9 +1,16 @@
 # Assume Role
 
 ## Using in your Repo
+First-time usage:
 ```
 git submodule add git@github.com:kelseymok/assume-role.git
 git submodule update --init
+```
+
+Cloning a project with the submodule:
+```
+git submodule update --init --recursive
+git pull --recurse-submodules && git submodule update --remote
 ```
 
 ## Console
