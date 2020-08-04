@@ -4,20 +4,28 @@ set -e
 set -o nounset
 set -o pipefail
 
-SCRIPT_DIR=$(cd "$(dirname "$0")" ; pwd -P)
-PROJECT_ROOT="${SCRIPT_DIR}/."
+script_dir=$(cd "$(dirname "$0")" ; pwd -P)
+project_root="${script_dir}/."
+app_name=${app_name}
 
 goal_build() {
-  pushd "${SCRIPT_DIR}" > /dev/null
-      docker build -t dev-env  .
+  pushd "${script_dir}" > /dev/null
+      docker build -t ${app_name}  .
   popd > /dev/null
 }
 
 goal_assume-role() {
-  pushd "${SCRIPT_DIR}" > /dev/null
-    role="${1:-}"
+  pushd "${script_dir}" > /dev/null
+  
+    base_profile="${1:-}"
+    if [ -z "${base_profile}" ]; then
+      echo "Base Profile not supplied. Usage: <BASE PROFILE> <ROLE>"
+      exit 1
+    fi
+
+    role="${2:-}"
     if [ -z "${role}" ]; then
-      echo "Role name not supplied"
+      echo "Role name not supplied. Usage: <BASE PROFILE> <ROLE>"
       exit 1
     fi
 
@@ -25,17 +33,16 @@ goal_assume-role() {
     home_dir=$(cd ~; pwd)
     echo "Mounting ${mounted_dir}"
 
-    if [ ! -z "$(docker ps -a | grep dev-env)" ]; then
-      docker rm -f dev-env
+    if [ ! -z "$(docker ps -a | grep ${app_name})" ]; then
+      docker rm -f ${app_name}
     fi
 
-
     docker run -it \
-      --name dev-env \
+      --name ${app_name} \
       -v "${mounted_dir}:/app" \
       -v "${home_dir}/.aws:/root/.aws" \
       --entrypoint="" \
-      dev-env assume-role $role
+      ${app_name} assume-role ${base_profile} ${role}
   popd > /dev/null
 }
 
@@ -45,16 +52,16 @@ goal_run() {
     home_dir=$(cd ~; pwd)
     echo "Mounting ${mounted_dir}"
 
-    if [ ! -z "$(docker ps -a | grep dev-env)" ]; then
-      docker rm -f dev-env
+    if [ ! -z "$(docker ps -a | grep ${app_name})" ]; then
+      docker rm -f ${app_name}
     fi
 
 
     docker run -it \
-      --name dev-env \
+      --name ${app_name} \
       -v "${mounted_dir}:/app" \
       -v "${home_dir}/.aws:/root/.aws" \
-      dev-env
+      ${app_name}
   popd > /dev/null
 }
 

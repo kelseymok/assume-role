@@ -56,4 +56,3 @@ provider "aws" {
   profile = "Your Role Name"
 }
 ```
-

@@ -2,19 +2,25 @@
 
 set -e
 
-role=$1
-if [ -z $role ]; then
-  echo "Role not set."
+base_profile=$1
+if [ -z "${base_profile}" ]; then
+  echo "Base Profile not set. Usage <BASE_PROFILE> <ROLE>"
   exit 1
 fi
 
-mfa_serial=$(aws configure get mfa_serial --profile base)
+role=$2
+if [ -z "${role}" ]; then
+  echo "Role not set. Usage: <BASE_PROFILE> <ROLE>"
+  exit 1
+fi
+
+mfa_serial=$(aws configure get mfa_serial --profile ${base_profile})
 if [ -z "${mfa_serial}" ]; then
   echo "mfa_serial for profile config does not exist. Did you set it?"
   exit 1
 fi
 
-mfa_serial=$(aws configure get mfa_serial --profile base)
+mfa_serial=$(aws configure get mfa_serial --profile ${base_profile})
 read -p "Enter MFA (${mfa_serial}): " mfa_response
 if [ -z "${mfa_response}" ]; then
   echo "MFA not provided"
