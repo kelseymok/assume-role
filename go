@@ -21,7 +21,7 @@ goal_assume-role() {
       exit 1
     fi
 
-    mounted_dir=$(cd ${PROJECT_ROOT}; pwd)
+    mounted_dir=$(cd ${PROJECT_ROOT}/..; pwd)
     home_dir=$(cd ~; pwd)
     echo "Mounting ${mounted_dir}"
 
@@ -41,7 +41,7 @@ goal_assume-role() {
 
 goal_run() {
   pushd "${SCRIPT_DIR}" > /dev/null
-    mounted_dir=$(cd ${PROJECT_ROOT}; pwd)
+    mounted_dir=$(cd ${PROJECT_ROOT}/..; pwd)
     home_dir=$(cd ~; pwd)
     echo "Mounting ${mounted_dir}"
 
