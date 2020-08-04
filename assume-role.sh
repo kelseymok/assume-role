@@ -27,16 +27,16 @@ if [ -z "${mfa_response}" ]; then
   exit 1
 fi
 
-account=$(aws sts get-caller-identity --profile base | jq -r '.Account')
+account=$(aws sts get-caller-identity --profile ${base_profile} | jq -r '.Account')
 
 response=$(aws sts assume-role \
 --role-arn "arn:aws:iam::${account}:role/${role}" \
 --role-session-name session \
---profile base \
+--profile ${base_profile} \
 --serial-number "${mfa_serial}" \
 --token-code "${mfa_response}")
 
-aws configure set aws_access_key_id $(echo $response | jq -r '.Credentials.AccessKeyId') --profile "${role}"
-aws configure set aws_secret_access_key $(echo $response | jq -r '.Credentials.SecretAccessKey') --profile "${role}"
-aws configure set aws_session_token $(echo $response | jq -r '.Credentials.SessionToken') --profile "${role}"
+aws configure set aws_access_key_id $(echo $response | jq -r '.Credentials.AccessKeyId') --profile "${base_profile}-${role}"
+aws configure set aws_secret_access_key $(echo $response | jq -r '.Credentials.SecretAccessKey') --profile "${base_profile}-${role}"
+aws configure set aws_session_token $(echo $response | jq -r '.Credentials.SessionToken') --profile "${base_profile}-${role}"
 

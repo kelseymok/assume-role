@@ -5,8 +5,7 @@ set -o nounset
 set -o pipefail
 
 script_dir=$(cd "$(dirname "$0")" ; pwd -P)
-project_root="${script_dir}/."
-app_name=${app_name}
+app_name=dev-env
 
 goal_build() {
   pushd "${script_dir}" > /dev/null
@@ -29,7 +28,7 @@ goal_assume-role() {
       exit 1
     fi
 
-    mounted_dir=$(cd ${PROJECT_ROOT}/..; pwd)
+    mounted_dir=$(cd ${script_dir}/..; pwd)
     home_dir=$(cd ~; pwd)
     echo "Mounting ${mounted_dir}"
 
@@ -47,8 +46,8 @@ goal_assume-role() {
 }
 
 goal_run() {
-  pushd "${SCRIPT_DIR}" > /dev/null
-    mounted_dir=$(cd ${PROJECT_ROOT}/..; pwd)
+  pushd "${script_dir}" > /dev/null
+    mounted_dir=$(cd ${script_dir}/..; pwd)
     home_dir=$(cd ~; pwd)
     echo "Mounting ${mounted_dir}"
 

@@ -11,8 +11,6 @@ RUN apk add --no-cache \
 
 RUN mkdir /root/.aws
 
-COPY assume-role.sh /usr/local/bin/assume-role
-
 ## Install Pip Packages
 RUN pip3 install --upgrade awscli
 
@@ -23,5 +21,7 @@ RUN curl -L -o ./terraform.zip \
     https://releases.hashicorp.com/terraform/${TERRAFORM_VERSION}/terraform_${TERRAFORM_VERSION}_linux_amd64.zip && \
     unzip -d /usr/local/bin ./terraform.zip && \
     rm terraform.zip
+
+COPY assume-role.sh /usr/local/bin/assume-role
 
 ENTRYPOINT bash
