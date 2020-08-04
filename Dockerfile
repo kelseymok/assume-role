@@ -6,7 +6,8 @@ RUN apk add --no-cache \
   curl \
   git \
   jq \
-  openssh
+  openssh \
+  make
 
 RUN mkdir /root/.aws
 
