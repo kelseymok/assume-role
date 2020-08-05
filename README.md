@@ -45,7 +45,7 @@ There are two ways to use this docker image:
 ```bash
 ./assume-role/go assume-role <base_profile:penguin-base> <role-name:my-awesome-role> 
 ```
-This creates/updates a profile named `<base-profile>-<role-name>` in your Shared Credentials file (`~/.aws/credentials`) which you can use on your local machine by calling AWS cli commands with the `--profile <base-profile>-<role-name>` flag (for example: `aws sts get-caller-identity --profile penguin-base-my-awesome-role`)
+This creates/updates a profile named `<role-name>` in your Shared Credentials file (`~/.aws/credentials`) which you can use on your local machine by calling AWS cli commands with the `--profile <role-name>` flag (for example: `aws sts get-caller-identity --profile penguin-base-my-awesome-role`)
  
 2. As a tool to assume a role and as a development environment (comes with Terraform and a few base libraries): 
 ```bash
@@ -55,7 +55,9 @@ This creates/updates a profile named `<base-profile>-<role-name>` in your Shared
 bash# assume-role <base-profile:penguin-base> <role-name:my-awesome-role>
 ``` 
 
-Both methods create/update your Shared Credentials file (`~/.aws/credentials`) with a profile named `<base-profile>-<role-name>` which you can use on your local machine or docker container by calling AWS cli commands with the `--profile <role-name>` flag (for example: `aws sts get-caller-identity --profile penguin-base-my-awesome-role`)
+Both methods create/update your Shared Credentials file (`~/.aws/credentials`) with a profile named `<role-name>` which you can use on your local machine or docker container by calling AWS cli commands with the `--profile <role-name>` flag (for example: `aws sts get-caller-identity --profile penguin-base-my-awesome-role`)
+
+NOTE: If your AWS Role name contains a path, such as `penguins/developer`, the resulting profile in your Shared Credentials file will be `penguins-developer` (the `/` is converted to `-` to aesthetic reasons).
 
 ## Using Your Assumed Role
 If you use Terraform, make sure to add a profile to your provider configuration:
@@ -66,7 +68,7 @@ provider "aws" {
 }
 ```
 
-If you're using the AWS CLI, don't forget to add `--profile <base-profile>-<role-name>` to your AWS CLI calls (for example: `aws sts get-caller-identity --profile penguin-base-my-awesome-role`)
+If you're using the AWS CLI, don't forget to add `--profile <role-name>` to your AWS CLI calls (for example: `aws sts get-caller-identity --profile penguin-base-my-awesome-role`)
 
 ## Console
 Because most people also use the Console, don't forget that you can always access your role in the console the following way:

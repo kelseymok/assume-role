@@ -14,6 +14,8 @@ if [ -z "${role}" ]; then
   exit 1
 fi
 
+display_role=$(echo $role | tr / -)
+
 mfa_serial=$(aws configure get mfa_serial --profile ${base_profile})
 if [ -z "${mfa_serial}" ]; then
   echo "mfa_serial for profile config does not exist. Did you set it?"
@@ -36,7 +38,7 @@ response=$(aws sts assume-role \
 --serial-number "${mfa_serial}" \
 --token-code "${mfa_response}")
 
-aws configure set aws_access_key_id $(echo $response | jq -r '.Credentials.AccessKeyId') --profile "${base_profile}-${role}"
-aws configure set aws_secret_access_key $(echo $response | jq -r '.Credentials.SecretAccessKey') --profile "${base_profile}-${role}"
-aws configure set aws_session_token $(echo $response | jq -r '.Credentials.SessionToken') --profile "${base_profile}-${role}"
+aws configure set aws_access_key_id $(echo $response | jq -r '.Credentials.AccessKeyId') --profile "${display_role}"
+aws configure set aws_secret_access_key $(echo $response | jq -r '.Credentials.SecretAccessKey') --profile "${display_role}"
+aws configure set aws_session_token $(echo $response | jq -r '.Credentials.SessionToken') --profile "${display_role}"
 
