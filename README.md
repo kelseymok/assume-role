@@ -6,19 +6,6 @@ The purpose of this project is to create a development environment which comes w
 * Docker
 * A device with an MFA Authenticator
 
-## Using in your Repo
-First-time usage:
-```
-git submodule add git@github.com:kelseymok/assume-role.git
-git submodule update --init
-```
-
-Cloning a project with the submodule:
-```
-git submodule update --init
-git pull --recurse-submodules && git submodule update --remote
-```
-
 ## CLI Access
 1. Set up your AWS CLI credentials according to the [AWS CLI docs](https://docs.aws.amazon.com/cli/latest/userguide/cli-chap-configure.html). 
 2. [Set up a MFA](https://docs.aws.amazon.com/IAM/latest/UserGuide/id_credentials_mfa_enable_virtual.html#enable-virt-mfa-for-iam-user). 
@@ -36,42 +23,36 @@ aws configure --profile ${base_profile} set mfa_serial <the ARN of your MFA devi
 ## Assume a Role
 In the root directory of your project, build the image:
 ```bash
-./assume-role/go build
-```
+export base_profile=penguin-base
+export role=myOrg/developer
 
-### Two ways to Assume a Role
-There are two ways to use this docker image:
-1. As a tool to assume a role: 
-```bash
-./assume-role/go assume-role <base_profile:penguin-base> <role-name:my-awesome-role> 
+docker run -it \
+  -v "$(cd ~; pwd)/.aws:/root/.aws" \
+  --entrypoint="" \
+  kb1rd/assume-role assume-role ${base_profile} ${role}
 ```
-This creates/updates a profile named `<role-name>` in your Shared Credentials file (`~/.aws/credentials`) which you can use on your local machine by calling AWS cli commands with the `--profile <role-name>` flag (for example: `aws sts get-caller-identity --profile penguin-base-my-awesome-role`)
+This puts a profile called `myOrg-developer` (note the `/` to `-` substitution -- it's a feature) in your AWS Credentials (`~/.aws/credentials`) to accommodate for roles that have a path. For roles without a path, the profile name is `developer`.
+
+## Use it
+### AWS CLI
+```bash
+aws sts get-caller-identity --profile myOrg-developer
+```
  
-2. As a tool to assume a role and as a development environment (comes with Terraform and a few base libraries): 
-```bash
-./assume-role/go run
-
-# Drops into a bash session
-bash# assume-role <base-profile:penguin-base> <role-name:my-awesome-role>
-``` 
-
-Both methods create/update your Shared Credentials file (`~/.aws/credentials`) with a profile named `<role-name>` which you can use on your local machine or docker container by calling AWS cli commands with the `--profile <role-name>` flag (for example: `aws sts get-caller-identity --profile penguin-base-my-awesome-role`)
-
-NOTE: If your AWS Role name contains a path, such as `penguins/developer`, the resulting profile in your Shared Credentials file will be `penguins-developer` (the `/` is converted to `-` to aesthetic reasons).
-
-## Using Your Assumed Role
-If you use Terraform, make sure to add a profile to your provider configuration:
+### Terraform
+In your provider:
 ```hcl-terraform
 provider "aws" {
   region = "eu-central-1"
-  profile = "Your Role Name"
+  profile = "myOrg-developer"
 }
 ```
 
-If you're using the AWS CLI, don't forget to add `--profile <role-name>` to your AWS CLI calls (for example: `aws sts get-caller-identity --profile penguin-base-my-awesome-role`)
-
-## Console
-Because most people also use the Console, don't forget that you can always access your role in the console the following way:
-```
-https://signin.aws.amazon.com/switchrole?account=<your-account_id_number>&roleName=<role_name>
+## Interactive Usage
+This image comes packed with Terraform `0.12.24` and can be used as a development environment:
+```bash
+docker run -it \
+  -v "$(cd ~; pwd)/.aws:/root/.aws" \
+  -v "$(cd ~; pwd)/PATH-TO-PROJECT:/app" \
+  kb1rd/assume-role bash
 ```
